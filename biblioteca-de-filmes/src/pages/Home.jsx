@@ -1,30 +1,37 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import MovieCard from "../components/MovieCard";
+
+import "./MovieGrid.css";
 
 const moviesURL = import.meta.env.VITE_API;
 const apiKey = import.meta.env.VITE_API_KEY;
 
 const Home = () => {
-    Const[topMovies, setTopMovies] = useState([]) // gerenciando os estados dos filmes
+  const [topMovies, setTopMovies] = useState([]);
 
-    const getTopRatedMovies = async(url)=>{ // Aqui estamos fazendo uma requisição assincrona, que vamos esperar o retorno da API
+  const getTopRatedMovies = async (url) => {
+    const res = await fetch(url);
+    const data = await res.json();
+    setTopMovies(data.results);
+  };
 
-        const resposta = await fetch(url);
-        const data = await resposta.json();
+  useEffect(() => {
+    const topRatedUrl = `${moviesURL}top_rated?${apiKey}`;
+    console.log(topRatedUrl);
+    getTopRatedMovies(topRatedUrl);
+  }, []);
 
-        setTopMovies(data.results);
-    };
-
-    useEffect(()=>{
-        const topRetadUrl = `${moviesURL}top_rated?${apiKey}`;
-    }, []);
+  console.log(topMovies);
 
   return (
-    <div>
-        {topMovies && topMovies.map((movie)=> <p>{ movie.title}</p>)}
+    <div className="container">
+      <h2 className="title">Melhores filmes:</h2>
+      <div className="movies-container">
+        {topMovies.length > 0 &&
+          topMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
-
-/* Aqui usei dois hooks, o useState para gerenciar o estado dos filmes e o useEffec para fazer a chamada da API quando a página carregar */
+export default Home;
